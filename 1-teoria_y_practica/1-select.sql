@@ -19,7 +19,8 @@ USE AdventureWorks2019
 ----------------------------------------------------
 
 -- Consulta 1
-SELECT * FROM Production.Product
+SELECT * 
+FROM Production.Product
 
 -- Consulta 2
 SELECT *
@@ -45,6 +46,12 @@ WHERE ProductLine = 'R'
 AND DaysToManufacture < 4
 ORDER BY Name ASC
 
+-- Consulta 6
+-- Indicar el listado de los empleados del sexo masculino y que son solteros
+SELECT * 
+FROM HumanResources.Employee 
+WHERE Gender  = 'M' 
+AND MaritalStatus = 'S'
 ----------------------------------------------------------
 -- B. Usar SELECT con encabezados de columna y cálculos --
 ----------------------------------------------------------

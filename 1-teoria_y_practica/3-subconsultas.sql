@@ -12,22 +12,9 @@
   | DELETE.                                      
   |-----------------------------------------------------------------------------------------| */
 
-/*|-----------------------------------------------------------------------------------------| 
-  | Hay dos tipos de subconsultas:                                                          |
-  |                                                                                         |
-  |                                                                                         |
-  | - Autocontenidas: la consulta interna se evalúa lógicamente una sola vez.               |
-  |                                                                                         |
-  |   Una subconsulta autocontenida puede utilizarse con los siguientes operadores:         |
-  |                                                                                         |
-  |	 - Operadores de comparación                                                            |
-  |                                                                                         |
-  |		- Operador IN                                                                       |
-  |     - Operador ANY o ALL                                                                |
-  |                                                                                         |
-  | - Correlación: su valor depende de una variable de la consulta externa. Por lo tanto, la| 
-  |                consulta interna de una subconsulta correlacionada se evalúa lógicamente |
-  |				   cada vez que el sistema recupera una nueva fila de la consulta externa   |
+/*|-----------------------------------------------------------------------------------------|
+  | NOTA ¡No utilice los operadores ANY y ALL! Toda consulta que utilice ANY o ALL puede    |
+  |  formularse mejor con la función EXISTS                                                 |
   |-----------------------------------------------------------------------------------------| */
 
 -- ==============================
@@ -46,11 +33,41 @@ WHERE ProductSubcategoryID IN
 
 /* Obtenga los números de los empleados y las fechas de ingreso de todos los empleados con fechas 
    de ingreso iguales a la fecha más antigua */
-USE sample
-SELECT emp_no,enter_date
-FROM [HumanResources].[Employee]
-WHERE enter_date =
-	(SELECT MIN(enter_date) FROM works_on)
+SELECT e.BusinessEntityID, CONCAT(p.FirstName, ' ', p.LastName) AS 'Nombre', e.HireDate
+FROM [HumanResources].[Employee] e
+INNER JOIN [Person].[Person] p
+ON p.BusinessEntityID = e.BusinessEntityID
+WHERE HireDate =
+	(SELECT MIN(HireDate) FROM [HumanResources].[Employee])
+
+-- Se desea traer aquellos nombres de productos (Production.Product) en donde el campo "Name"
+-- de la tabla (Production.ProductModel) sea "Long-sleeve logo jersey"
+SELECT 
+ProductID, Name 
+FROM Production.Product
+WHERE Product.ProductModelID = 
+	(SELECT ProductModelID FROM Production.ProductModel 
+	     WHERE ProductModel.Name = 'Long-sleeve Logo Jersey')
+
+--Obtener los detalles completos de todos los empleados que viven en la ciudad 'London'
+SELECT *
+FROM [HumanResources].[Employee]  
+WHERE BusinessEntityID IN 
+	(SELECT BusinessEntityID FROM [Person].[BusinessEntityAddress] WHERE AddressID IN 
+        (SELECT AddressID FROM [Person].[Address] WHERE City = 'London'))
+
+-- Buscar los nombres de los empleados que han vendido el producto con el número 'BK-M68B-42'
+SELECT DISTINCT pp.LastName, pp.FirstName 
+FROM Person.Person pp 
+INNER JOIN HumanResources.Employee e
+ON e.BusinessEntityID = pp.BusinessEntityID 
+WHERE pp.BusinessEntityID IN 
+                            (SELECT SalesPersonID FROM Sales.SalesOrderHeader
+                              WHERE SalesOrderID IN 
+                                                    (SELECT SalesOrderID FROM Sales.SalesOrderDetail
+                                                      WHERE ProductID IN 
+                                                                        (SELECT ProductID FROM Production.Product 
+                                                                          WHERE ProductNumber = 'BK-M68B-42')))
 
 
 -- ===============================
@@ -60,3 +77,71 @@ WHERE enter_date =
 -- Una subconsulta correlacionada es una consulta que depende de la consulta externa para obtener 
 -- sus valores. Se ejecuta varias veces, una vez por cada fila que la consulta externa pueda 
 -- seleccionar.
+
+------------
+-- EXISTS --
+------------
+
+-- A pesar de ser similar al predicado IN, el predicado EXISTS tiene un enfoque ligeramente diferente. 
+-- Está dedicado únicamente a determinar si la subconsulta arroja alguna fila o no. Si ésta arroja una 
+-- o más filas, el predicado se evalúa como verdadero; de otra manera, el predicado se evalúa como falso. 
+-- El predicado consiste de la palabra clave EXISTS y una subconsulta. 
+
+-- La función EXISTS toma una consulta interna como argumento y devuelve TRUE si la consulta interna 
+-- devuelve una o más filas, y devuelve FALSE si devuelve cero filas.
+
+SELECT DISTINCT Name
+FROM Production.Product AS p 
+WHERE EXISTS
+    (SELECT *
+     FROM Production.ProductModel AS pm 
+     WHERE p.ProductModelID = pm.ProductModelID
+           AND pm.Name LIKE 'Long-Sleeve Logo Jersey%')
+
+-- Obtenemos lo mismo, pero ambas tienen distinto enfoque. En ambas ponemos como condición que tengan un 
+-- mismo valor id en el campo 'ProductModelID' y además que el nombre del modelo comience con la cadena
+-- 'Long-Sleeve Logo Jersey'
+
+SELECT DISTINCT Name
+FROM Production.Product AS p
+WHERE ProductModelID IN
+    (SELECT ProductModelID 
+     FROM Production.ProductModel AS pm
+     WHERE p.ProductModelID = pm.ProductModelID
+        AND Name LIKE 'Long-Sleeve Logo Jersey%')
+
+-- En el ejemplo siguiente se usa IN y se recupera una instancia del nombre y apellido de cada empleado cuya 
+-- bonificación en la tabla SalesPerson sea de 5000.00 y cuyos números de identificación coincidan en las tablas 
+-- Employee y SalesPerson.
+
+SELECT DISTINCT p.LastName, p.FirstName 
+FROM Person.Person AS p 
+INNER JOIN HumanResources.Employee AS e
+ON e.BusinessEntityID = p.BusinessEntityID 
+WHERE 5000.00 IN
+               (SELECT Bonus FROM Sales.SalesPerson AS sp
+                  WHERE e.BusinessEntityID = sp.BusinessEntityID)
+
+-- o podriamos trabajarlo con Subconsulta autocontenida. Obtenemos lo mismo. 
+
+SELECT DISTINCT p.LastName, p.FirstName 
+FROM Person.Person AS p 
+INNER JOIN HumanResources.Employee AS e
+ON e.BusinessEntityID = p.BusinessEntityID 
+WHERE e.BusinessEntityID IN
+               (SELECT BusinessEntityID FROM Sales.SalesPerson WHERE bonus = 5000.00)
+
+-- Liste aquellos clientes que tengan al menos una orden realizada. Se utilizan las tablas Sales.Customer y 
+-- Sales.SalesOrderHeader.
+SELECT c.CustomerID
+FROM Sales.Customer c
+WHERE EXISTS 
+            (SELECT CustomerID FROM Sales.SalesOrderHeader so
+              WHERE so.CustomerID = c.CustomerID) 
+
+-- Lista de clientes que no hayan realizado una orden de compra --
+SELECT c.CustomerID
+FROM Sales.Customer c
+WHERE NOT EXISTS 
+                (SELECT CustomerID FROM Sales.SalesOrderHeader so 
+                  WHERE so.CustomerID = c.CustomerID)
