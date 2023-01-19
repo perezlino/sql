@@ -104,8 +104,8 @@ SELECT DATEDIFF (DAY,'01-01-2020',GETDATE()) -- 1111
 -- === YEAR, MONTH y DAY ===
 -- ==========================
 
--- YEAR: Devuelve el año
--- MONTH: Devuelve el número de mes
+-- YEAR: Devuelve el año. Devuelve un entero.
+-- MONTH: Devuelve el número de mes. Devuelve un entero.
 SELECT customer_id, year, month
 FROM (SELECT CustomerID AS customer_id, YEAR(OrderDate) AS year,
              MONTH(OrderDate) AS month, DAY(OrderDate) AS day
@@ -113,7 +113,7 @@ FROM (SELECT CustomerID AS customer_id, YEAR(OrderDate) AS year,
 GROUP BY customer_id, year, month
 ORDER BY customer_id
 
--- DAY: Devuelve el número del día
+-- DAY: Devuelve el número del día. Devuelve un entero.
 SELECT DAY(OrderDate) 
 FROM Sales.SalesOrderHeader
 
