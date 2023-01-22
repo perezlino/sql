@@ -10,17 +10,26 @@
   - Si una transaccion tiene éxito, todas las modificaciones que esta realiza se confirman y se almacenan
     de manera permanente en la BD.
  
-  - Si una trnasacción encuentra errores y debe cancelarse o revertirse, se borran todas las modificaciones
+  - Si una transacción encuentra errores y debe cancelarse o revertirse, se borran todas las modificaciones
     de los datos.
 
-	Nota: Cada sentencia es independiente, los errores en una no afectan a la otra, ni detienen la ejecución
-	de las demás. */
+	NOTA: Cada sentencia es independiente, los errores en una no afectan a la otra, ni detienen la ejecución
+	      de las demás.
+
+    
+
+
+
+
+
+
+
 
   Tipos de transacción:
 
   - CONFIRMACIÓN AUTOMÁTICA: 
 
-  --La tabla existe, la sentencia se ejcuta sin problemas y se guarda en la base de datos inmediatamente:
+  --La tabla existe, la sentencia se ejecuta sin problemas y se guarda en la base de datos inmediatamente:
     
 	UPDATE Shippers
 	SET CompanyName = 'Asesoria BI'
