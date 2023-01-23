@@ -243,3 +243,170 @@ FROM Person.Person
 
 SELECT LOWER(CONCAT_WS(' ', FirstName, LastName)) AS Nombre_completo
 FROM Person.Person
+
+-- ============================================================================================
+-- ============================================================================================
+
+-- ============
+-- === LEFT ===
+-- ============
+
+/* La función LEFT() extrae un número determinado de caracteres de la parte izquierda de una cadena 
+   suministrada. Por ejemplo, LEFT('SQL Server', 3) devuelve SQL.
+
+   La sintaxis de la función LEFT() es la siguiente:
+
+                        LEFT ( input_string , number_of_characters )  
+
+   En esta sintaxis:
+
+   El input_string puede ser una cadena literal, variable o columna. El tipo de datos del resultado 
+   del input_string puede ser cualquier tipo de datos, excepto TEXT o NTEXT, que se convierte implícitamente 
+   a VARCHAR o NVARCHAR.
+
+   El number_of_characters es un entero positivo que especifica el número de caracteres de la input_string 
+   que se devolverán.
+
+   La función LEFT() devuelve un valor de VARCHAR cuando el input_string es un tipo de datos de caracteres 
+   no Unicode o NVARCHAR si el input_string es un tipo de datos de caracteres Unicode.
+
+
+   Ejemplos de la función LEFT() de SQL Server
+   ===========================================
+
+   Veamos algunos ejemplos de uso de la función LEFT() para entenderla mejor.
+
+   A) Uso de la función LEFT() con una cadena de caracteres literal
+   ================================================================
+
+   La siguiente sentencia utiliza LEFT() para devolver los tres caracteres situados más a la izquierda de la 
+   cadena de caracteres SQL Server:  */
+
+SELECT LEFT('SQL Server',3) Result_string
+   
+-- Este es el resultado:
+
+   Result_string
+   -------------
+   SQL
+
+   (1 row affected)
+
+
+/* B) Utilización de la función LEFT() con una columna de la tabla
+   ===============================================================
+
+   El siguiente ejemplo devuelve los siete caracteres situados más a la izquierda de cada nombre de producto 
+   de la tabla Production.Products:  */
+
+SELECT 
+    product_name,
+    LEFT(product_name, 7) first_7_characters
+FROM 
+    Production.Products
+ORDER BY 
+    product_name
+
+-- Se muestra la salida parcial:
+
+-- |---------------------------|--------------------|
+-- |        product_name       | first_7_characters |
+-- |---------------------------|--------------------|
+-- |Electra Amsterdam Fashion  |       Electra      |
+-- |Electra Amsterdam Original |       Electra      |
+-- |Electra Cruiser            |       Electra      |
+-- |       ............        |     ...........    |
+-- |---------------------------|--------------------|
+
+/* C) Uso de la función LEFT() con la cláusula GROUP BY
+
+   El siguiente ejemplo utiliza la función LEFT() para devolver un conjunto de iniciales del nombre del producto 
+   y el número de cada producto para cada inicial:   */
+
+SELECT
+	LEFT(product_name, 1) initial,  
+	COUNT(product_name) product_count
+FROM 
+	Production.Products
+GROUP BY
+	left(product_name, 1)
+ORDER BY 
+	initial
+
+-- |---------|---------------|
+-- | initial | product_count |
+-- |---------|---------------|
+-- |    E    |      118      |
+-- |    H    |       13      |
+-- |    P    |        3      |
+-- |    R    |        1      |
+-- |    S    |       51      |
+-- |    T    |      135      |
+-- |---------|---------------|
+
+
+-- ============================================================================================
+-- ============================================================================================
+
+-- =============
+-- === RIGHT ===
+-- =============
+
+/* La función RIGHT() extrae un número determinado de caracteres de la parte derecha de una cadena de 
+   caracteres especificada. Por ejemplo, RIGHT('SQL Server', 6) devuelve Server.
+
+   La sintaxis de la función RIGHT() es la siguiente:
+
+                              RIGHT ( input_string , number_of_characters )  
+   
+   En esta sintaxis:
+
+   El input_string puede ser una cadena literal, variable o columna. El resultado del input_string puede 
+   estar en cualquier tipo de datos, excepto TEXT o NTEXT, que se convierte implícitamente a VARCHAR o 
+   NVARCHAR.
+
+   El number_of_characters es un entero positivo que especifica el número de caracteres de la input_string 
+   que se devolverán.
+
+   Tenga en cuenta que la función RIGHT() devuelve un valor de VARCHAR cuando la cadena de entrada es un 
+   tipo de datos de caracteres no Unicode o NVARCHAR si la cadena de entrada es un tipo de datos de caracteres 
+   Unicode.
+
+
+   Ejemplos de la función RIGHT() de SQL Server
+   ============================================
+
+   La siguiente sentencia utiliza RIGHT() para devolver los tres caracteres situados más a la derecha de la 
+   cadena de caracteres SQL Server:   */
+
+SELECT RIGHT('SQL Server',6) Result_string
+
+-- Este es el resultado:
+
+Result_string
+-------------
+Server
+
+(1 row affected)
+
+-- El siguiente ejemplo devuelve los cuatro caracteres situados más a la derecha de cada nombre de producto de 
+-- la tabla Production.Products de la base de datos de ejemplo:
+
+SELECT 
+    product_name,
+    RIGHT(product_name, 4) last_4_characters
+FROM 
+    Production.Products
+ORDER BY 
+    product_name
+
+-- Este es el resultado:
+
+-- |--------------------------------|--------------------|
+-- |          product_name          |  last_4_characters |
+-- |--------------------------------|--------------------|
+-- |Electra Amsterdam Fashion 2018  |        2018        |
+-- |Electra Amsterdam Original 2019 |        2019        |
+-- |Electra Cruiser 2020            |        2020        |
+-- |            ............        |     ...........    |
+-- |--------------------------------|--------------------|
