@@ -145,19 +145,19 @@ varbinary (including varbinary(max) )
 binary (lowest)                                                                       
 
 2.- COALESCE(NULL,NULL) --> Si el primer valor tiene un tipo NULL y el segundo parámetro también,
-                            el resultado devolverá un ERROR.  */
+                            el resultado devolverá un ERROR.
 
-/*
-ISNULL(float,int) --> Si el primer valor tiene un tipo de dato definido, el resultado tendrá
+
+COALESCE(float,int) --> Si el primer valor tiene un tipo de dato definido, el resultado tendrá
                       este tipo de dato
 
-ISNULL(NULL,int) --> Si el primer valor tiene un tipo NULL, el resultado tendrá el tipo de dato
+COALESCE(NULL,int) --> Si el primer valor tiene un tipo NULL, el resultado tendrá el tipo de dato
                      del segundo parámetro (aunque este también sea nulo)
 
-ISNULL(NULL,NULL) --> Si el primer valor tiene un tipo NULL y el segundo parámetro también,
+COALESCE(NULL,NULL) --> Si el primer valor tiene un tipo NULL y el segundo parámetro también,
                       el resultado tendrá el tipo de dato INTEGER. 
 
-ISNULL(int=NULL,VARCHAR) --> Si el primero valor es un tipo de dato INT pero es un valor NULL y 
+COALESCE(int=NULL,VARCHAR) --> Si el primero valor es un tipo de dato INT pero es un valor NULL y 
                              el segundo parámetro es VARCHAR, se devolverá el valor del segundo
                              parámetro pero con el tipo de dato INT, dado que tiene mayor prioridad.
                              En este caso, si el VARCHAR es una cadena, devolverá un ERROR.
@@ -231,3 +231,25 @@ SELECT COALESCE(NULL, NULL) AS [COALESCE]
 SELECT SUM(CASE WHEN Title IS NULL THEN 1 ELSE 0 END) AS [Number Of Null Values],
        COUNT(Title) AS [Number Of Non-Null Values]
 FROM Person.Person
+
+-- ============================================================================================
+-- ============================================================================================
+
+-- Concatenación ante la existencia de un NULL sin utilizar la función CONCAT
+
+DECLARE @firstname AS VARCHAR(20)
+DECLARE @middlename AS VARCHAR(20)
+DECLARE @lastname AS VARCHAR(20)
+
+SET @firstname = 'Alfonso'
+SET @lastname = 'Perez'
+
+SELECT @firstname + IIF(@middlename IS NULL, '', ' ' + @middlename) + ' ' + @lastname AS Nombre_completo
+
+SELECT @firstname + CASE 
+                     WHEN @middlename IS NULL THEN '' 
+                     ELSE ' ' + @middlename 
+                    END 
+                  + ' ' + @lastname AS Nombre_completo
+
+SELECT @firstname + ' ' + COALESCE(@middlename,'') + ' ' + @lastname AS Nombre_completo

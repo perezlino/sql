@@ -43,8 +43,8 @@ SELECT FORMAT(CAST('07:35' AS TIME), N'hh.mm');   --> returns NULL
 SELECT FORMAT(CAST('07:35' AS TIME), N'hh:mm');   --> returns NULL
 
 -- FORMAT devuelve una cadena con formato porque . y : incluyen caracteres de escape.
-SELECT FORMAT(cast('07:35' AS TIME), N'hh\.mm');  --> returns 07.35  
-SELECT FORMAT(cast('07:35' AS TIME), N'hh\:mm');  --> returns 07:35
+SELECT FORMAT(CAST('07:35' AS TIME), N'hh\.mm');  --> returns 07.35  
+SELECT FORMAT(CAST('07:35' AS TIME), N'hh\:mm');  --> returns 07:35
 
 -- FORMAT devuelve la hora actual con el formato AM o PM especificado.
 SELECT FORMAT(SYSDATETIME(), N'hh:mm tt'); -- returns 03:46 PM
@@ -207,6 +207,39 @@ FROM Person.Person P
 
 SELECT CONCAT(FirstName, ' ', LastName) AS Nombre_completo
 FROM Person.Person
+
+-- ============================================================================================
+
+-- Concatenación ante la existencia de un NULL sin utilizar la función CONCAT
+
+DECLARE @firstname AS VARCHAR(20)
+DECLARE @middlename AS VARCHAR(20)
+DECLARE @lastname AS VARCHAR(20)
+
+SET @firstname = 'Alfonso'
+SET @lastname = 'Perez'
+
+SELECT @firstname + IIF(@middlename IS NULL, '', ' ' + @middlename) + ' ' + @lastname AS Nombre_completo
+
+SELECT @firstname + CASE 
+                     WHEN @middlename IS NULL THEN '' 
+                     ELSE ' ' + @middlename 
+                    END 
+                  + ' ' + @lastname AS Nombre_completo
+
+SELECT @firstname + ' ' + COALESCE(@middlename,'') + ' ' + @lastname AS Nombre_completo
+
+-- ============================================================================================
+
+-- Concatenación de strings con números
+
+SELECT 'Mi numero es: ' + CONVERT(VARCHAR(20), 350000)
+
+SELECT 'Mi numero es: ' + CAST(350000 AS VARCHAR(20))
+
+SELECT 'Mi salario es: $' + CONVERT(VARCHAR(20), 350000.20)
+
+SELECT 'Mi salario es: ' + FORMAT(350000, 'C', 'en-us')
 
 -- ============================================================================================
 -- ============================================================================================
