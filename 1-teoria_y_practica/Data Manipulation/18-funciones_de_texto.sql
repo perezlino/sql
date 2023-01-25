@@ -32,6 +32,9 @@ FROM Sales.SalesOrderHeader
 SELECT OrderDate, FORMAT(OrderDate,'yyyy/MM') año_mes
 FROM Sales.SalesOrderHeader
 
+SELECT OrderDate, FORMAT(OrderDate,'yyyyMM') año_mes
+FROM Sales.SalesOrderHeader
+
 -- FORMAT con cadenas de formato personalizado
 
 DECLARE @num INT = 123456789

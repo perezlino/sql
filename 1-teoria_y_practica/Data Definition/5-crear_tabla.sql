@@ -84,3 +84,28 @@ CREATE TABLE Sales.Visits (
    Al final de la definición de la tabla hay una restricción FOREIGN KEY. Esta clave foránea garantiza que 
    los valores de la columna "store_id" de la tabla "visits" deben estar disponibles en la columna store_id 
    de la tabla stores. 
+
+   Esta sentencia enumera todas las tablas de una base de datos especifica del servidor SQL
+   ========================================================================================   */
+
+SELECT 
+    name
+FROM 
+    AdventureWorks2019.sys.columns
+ORDER BY 
+    name
+  
+
+/* Esta sentencia enumera todas las tablas, sus columnas y tipos de datos
+   ======================================================================   */
+
+SELECT o.name nombre_tabla, 
+       c.name nombre_columna, 
+       t.name tipo_dato
+FROM AdventureWorks2019.sys.columns c
+INNER JOIN AdventureWorks2019.sys.objects o
+ON o.object_id = c.object_id
+LEFT JOIN sys.types t
+ON t.user_type_id = c.user_type_id
+WHERE o.name = 'Employee' ------------------> Para indicar una tabla especifica
+ORDER BY o.name

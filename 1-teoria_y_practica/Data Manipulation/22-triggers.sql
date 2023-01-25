@@ -9,8 +9,14 @@
 
   - Un trigger puede ser invocado en respuesta a un INSERT, UPDATE o DELETE
   - Un trigger puede ser invocado en respuesta a una sentencia ALTER, CREATE o DROP
-  - Un trigger puede ser invocado en respuesta a un evento de login.                        
+  - Un trigger puede ser invocado en respuesta a un evento de login.   
 
+-- ============================================================================================
+-- ============================================================================================                    
+
+-- ==================================
+-- === FOR o AFTER (son lo mismo) ===
+-- ==================================
 
   Introducción a la sentencia CREATE TRIGGER de SQL Server
   =========================================================
@@ -22,7 +28,7 @@
 
 								CREATE TRIGGER [schema_name.]trigger_name
 								ON table_name
-								AFTER  {[INSERT],[UPDATE],[DELETE]}
+								FOR o AFTER {[INSERT],[UPDATE],[DELETE]}
 								[NOT FOR REPLICATION]
 								AS
 								{sql_statements}
@@ -305,7 +311,7 @@ WHERE product_id = 322
 
     La siguiente sentencia elimina el trigger trg_index_changes:
 
-					DROP TRIGGER IF EXISTS trg_index_changes;
+					DROP TRIGGER IF EXISTS trg_index_changes; */
 
 -- ============================================================================================
 -- ============================================================================================
