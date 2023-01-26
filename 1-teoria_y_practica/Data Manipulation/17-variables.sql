@@ -149,22 +149,100 @@ SET NOCOUNT ON
 
 -- Primero, declare variables que contengan el nombre del producto y el precio de lista:
 
-DECLARE @product_name VARCHAR(MAX),
-        @list_price DECIMAL(10,2)
+DECLARE @producto_nombre VARCHAR(MAX),
+        @precio_catalogo DECIMAL(10,2)
 
 -- En segundo lugar, asigne los nombres de las columnas a las variables correspondientes:
 
-SELECT @product_name = product_name,
-       @list_price = list_price
+SELECT @producto_nombre = producto_nombre,
+       @precio_catalogo = precio_catalogo
 FROM
-    production.products
-WHERE
-    product_id = 100
+    Produccion.productos
 
 -- En tercer lugar, emite el contenido de las variables:
 
-SELECT @product_name AS product_name, 
-       @list_price AS list_price
+SELECT @producto_nombre AS product_name, 
+       @precio_catalogo AS list_price
+
+-- Este es el resultado que obtenemos:
+
+-- |-------------------------------------|-------------------|
+-- |             producto_nombre         |  precio_catalogo  | 
+-- |-------------------------------------|-------------------|
+-- | Trek Checkpoint ALR Frameset - 2019 | 	    3199.99      |
+-- |-------------------------------------|-------------------|
+
+-- Pero porque devolvió ese registro y no otro? Porque si le asignamos a variables, columnas de 
+-- una tabla SIEMPRE nos devolverá el ÚLTIMO registro, a menos, que la consulta nos devuelva un
+-- único registro, en ese caso, devovlerá ese registro. A continuación veamos los registros de la
+-- tabla "Produccion.productos": */
+
+SELECT producto_id,
+       producto_nombre,
+       precio_catalogo
+FROM
+    Produccion.productos
+
+-- Este es el resultado que obtenemos:
+
+-- |-------------|-------------------------------------|-------------------|
+-- | producto_id |             producto_nombre         |  precio_catalogo  | 
+-- |-------------|-------------------------------------|-------------------|
+-- |      1	     |           Trek 820 - 2016	       |       379.99      |
+-- |      2	     |  Ritchey Timberwolf Frameset - 2016 |       749.99      |
+-- |      3	     |   Surly Wednesday Frameset - 2016   |	   999.99      |
+-- |      4	     |      Trek Fuel EX 8 29 - 2016	   |      2899.99      |
+-- |      5	     |    Heller Shagamaw Frame - 2016     |	  1320.99      |
+-- |    .....    |          .....................      |     .........     |
+-- |    .....    |          .....................      |     .........     |
+-- |     321     | Trek Checkpoint ALR Frameset - 2019 |	   3199.99     | <------------- ÚLTIMO REGISTRO
+-- |-------------|-------------------------------------|-------------------|
+
+
+-- Ejemplo 2:  */
+
+DECLARE @producto_nombre VARCHAR(MAX),
+        @precio_catalogo DECIMAL(10,2)
+
+
+SELECT @producto_nombre = producto_nombre,
+       @precio_catalogo = precio_catalogo
+FROM
+    Produccion.productos
+
+WHERE
+    precio_catalogo > 7000
+
+-- En tercer lugar, emite el contenido de las variables:
+
+SELECT @producto_nombre AS product_name, 
+       @precio_catalogo AS list_price
+
+-- Este es el resultado que obtenemos:
+
+-- |-------------------------------------|-------------------|
+-- |             producto_nombre         |  precio_catalogo  | 
+-- |-------------------------------------|-------------------|
+-- |     Trek Domane SLR 9 Disc - 2018   |   	11999.99     |
+-- |-------------------------------------|-------------------|
+
+-- Ahora si visualizamos la consulta:
+
+SELECT producto_id,
+       producto_nombre,
+       precio_catalogo
+FROM
+    Produccion.productos
+WHERE   
+    precio_catalogo > 7000
+
+-- |-------------|---------------------------------------|-------------------|
+-- | producto_id |             producto_nombre           |  precio_catalogo  | 
+-- |-------------|---------------------------------------|-------------------|
+-- |     149	 |     Trek Domane SLR 8 Disc - 2018	 |      7499.99      |
+-- |     155     |     Trek Domane SLR 9 Disc - 2018	 |      11999.99     |  <------------- ÚLTIMO REGISTRO
+-- |-------------|---------------------------------------|-------------------|
+
 
 -- ================================================================================================
 -- ================================

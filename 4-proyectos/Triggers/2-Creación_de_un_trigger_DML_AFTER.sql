@@ -72,6 +72,7 @@ BEGIN
         deleted
 END
 
+
 /*
  3) Prueba del trigger
  =====================
@@ -96,33 +97,29 @@ VALUES (
 /*
     Debido al evento INSERT, se disparó el trigger "Produccion.trg_auditoria_producto" de la tabla "Produccion.productos".
     Examinemos el contenido de la tabla "Produccion.AuditoriasProducto":  */
+    
 
 SELECT * 
 FROM Produccion.AuditoriasProducto
 
 /*
-
 |---------------|-----------|---------------|--------|------------|----------|---------------|------------------------|---------|
 |modificacion_id|producto_id|producto_nombre|marca_id|categoria_id|ano_modelo|precio_catalogo|      actualizado_a     |operation|
 |---------------|-----------|---------------|--------|------------|----------|---------------|------------------------|---------|
 |       1       |    322    | Test product  |   1    |      1     |   2018   |     599.00    |2023-01-24 23:17:30.833 |   INS   |
 |---------------|-----------|---------------|--------|------------|----------|---------------|------------------------|---------|
-
-
+    
     La siguiente sentencia elimina una fila de la tabla "Produccion.productos":  */
+
 
 DELETE FROM Produccion.productos
 WHERE producto_id = 322
 
 /*
-
 |---------------|-----------|---------------|--------|------------|----------|---------------|------------------------|---------|
 |modificacion_id|producto_id|producto_nombre|marca_id|categoria_id|ano_modelo|precio_catalogo|      actualizado_a     |operation|
 |---------------|-----------|---------------|--------|------------|----------|---------------|------------------------|---------|
 |       1       |    322    | Test product  |   1    |      1     |   2018   |     599.00    |2023-01-24 23:17:30.833 |   INS   |
 |       2       |    322    | Test product  |   1    |      1     |   2018   |     599.00    |2023-01-24 23:28:15.530 |   DEL   |
 |---------------|-----------|---------------|--------|------------|----------|---------------|------------------------|---------|
-
-
-    La siguiente sentencia elimina una fila de la tabla "Produccion.productos":  */
-
+*/

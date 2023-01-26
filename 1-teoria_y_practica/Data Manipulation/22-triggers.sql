@@ -64,46 +64,49 @@
    |  INSERT  |            filas a insertar           |                  vacía                    |
    |  UPDATE  |nuevas filas modificadas por el update |filas existentes modificadas por el update |	
    |  DELETE  |                 vacía                 |             filas a eliminar              |
-   |----------|---------------------------------------|-------------------------------------------| 
+   |----------|---------------------------------------|-------------------------------------------| */
 
+   USE TiendaBicicletas
+
+/*
 
    Ejemplo de CREATE TRIGGER en SQL Server
    =======================================
 
-   Veamos un ejemplo de creación de un nuevo trigger. Utilizaremos la tabla production.products de la base de 
+   Veamos un ejemplo de creación de un nuevo trigger. Utilizaremos la tabla Produccion.productos de la base de 
    datos de ejemplo para la demostración.
    
-   |-------------------|
-   |production.products|
-   |-------------------|
-   |   * product_id    |
-   |    product_name   |
-   |      brand_id     |
-   |    category_id    |
-   |    model_year     |
-   |    list_price     |
-   |-------------------|
+   |--------------------|
+   |Produccion.productos|
+   |--------------------|
+   |   * producto_id    |
+   |   producto_nombre  |
+   |      marca_id      |
+   |    categoria_id    |
+   |     ano modelo     |
+   |   precio_catalogo  |
+   |--------------------|
    
    1) Crear una tabla para registrar los cambios
 
-   La siguiente sentencia crea una tabla llamada production.product_audits para registrar información cuando se 
-   produce un evento INSERT o DELETE en la tabla production.products:  */
+   La siguiente sentencia crea una tabla llamada Produccion.AuditoriasProducto para registrar información cuando se 
+   produce un evento INSERT o DELETE en la tabla Produccion.productos:  */
 
-   CREATE TABLE production.product_audits(
-    change_id INT IDENTITY PRIMARY KEY,
-    product_id INT NOT NULL,
-    product_name VARCHAR(255) NOT NULL,
-    brand_id INT NOT NULL,
-    category_id INT NOT NULL,
-    model_year SMALLINT NOT NULL,
-    list_price DEC(10,2) NOT NULL,
-    updated_at DATETIME NOT NULL,
-    operation CHAR(3) NOT NULL,
-    CHECK(operation = 'INS' or operation='DEL')
-   )
+CREATE TABLE Produccion.AuditoriasProducto(
+modificacion_id INT IDENTITY PRIMARY KEY,
+producto_id INT NOT NULL,
+producto_nombre VARCHAR(255) NOT NULL,
+marca_id INT NOT NULL,
+categoria_id INT NOT NULL,
+ano_modelo SMALLINT NOT NULL,
+precio_catalogo DEC(10,2) NOT NULL,
+actualizado_a DATETIME NOT NULL,
+operacion CHAR(3) NOT NULL,
+CHECK(operacion = 'INS' or operacion='DEL')
+)
 
-/* La tabla production.product_audits tiene todas las columnas de la tabla production.products. Además, tiene 
-   algunas columnas más para registrar los cambios, por ejemplo, updated_at, operation y change_id.
+/* La tabla Produccion.AuditoriasProducto tiene todas las columnas de la tabla Produccion.productos. Además, tiene 
+   algunas columnas más para registrar los cambios, por ejemplo, actualizado_a, operacion y modificacion_id.
 
 
    2) Creación de un trigger DML AFTER
@@ -111,12 +114,12 @@
    En primer lugar, para crear un nuevo trigger, especifique el nombre del trigger y el schema al que pertenece 
    el trigger en la cláusula CREATE TRIGGER:   */
 
-   CREATE TRIGGER production.trg_product_audit
+   CREATE TRIGGER Produccion.trg_auditoria_producto
 
 -- A continuación, especifique en la cláusula ON el nombre de la tabla que activará el trigger cuando se 
 -- produzca un evento: 
 
-   ON production.products
+   ON Produccion.productos
 
 -- A continuación, indique el evento o eventos que activarán el trigger en la cláusula AFTER:
 
@@ -132,83 +135,83 @@
 
   SET NOCOUNT ON
 
--- El trigger insertará una fila en la tabla production.product_audits cada vez que se inserte o elimine una 
--- fila de la tabla production.products. Los datos para la inserción se obtienen de las tablas INSERTED y 
+-- El trigger insertará una fila en la tabla Produccion.AuditoriasProducto cada vez que se inserte o elimine una 
+-- fila de la tabla Produccion.productos. Los datos para la inserción se obtienen de las tablas INSERTED y 
 -- DELETED mediante el operador UNION ALL:
 
 INSERT INTO
-    production.product_audits
+    Produccion.AuditoriasProducto
         (
-            product_id,
-            product_name,
-            brand_id,
-            category_id,
-            model_year,
-            list_price,
-            updated_at,
-            operation
+            producto_id,
+            producto_nombre,
+            marca_id,
+            categoria_id,
+            ano_modelo,
+            precio_catalogo,
+            actualizado_a,
+            operacion
         )
 SELECT
-    i.product_id,
-    product_name,
-    brand_id,
-    category_id,
-    model_year,
-    i.list_price,
+    i.producto_id,
+    producto_nombre,
+    marca_id,
+    categoria_id,
+    ano_modelo,
+    i.precio_catalogo,
     GETDATE(),
     'INS'
 FROM
     inserted AS i
 UNION ALL
     SELECT
-        d.product_id,
-        product_name,
-        brand_id,
-        category_id,
-        model_year,
-        d.list_price,
-        getdate(),
+        d.producto_id,
+        producto_nombre,
+        marca_id,
+        categoria_id,
+        ano_modelo,
+        d.precio_catalogo,
+        GETDATE(),
         'DEL'
     FROM
         deleted AS d
 
 -- A continuación se reúnen todas las partes:
 
-CREATE TRIGGER production.trg_product_audit
-ON production.products
+CREATE TRIGGER Produccion.trg_auditoria_producto
+ON Produccion.productos
 AFTER INSERT, DELETE
 AS
 BEGIN
     SET NOCOUNT ON
-    INSERT INTO production.product_audits(
-        product_id, 
-        product_name,
-        brand_id,
-        category_id,
-        model_year,
-        list_price, 
-        updated_at, 
-        operation
+    INSERT INTO Produccion.AuditoriasProducto(
+        producto_id, 
+        producto_nombre,
+        marca_id,
+        categoria_id,
+        ano_modelo,
+        precio_catalogo, 
+        actualizado_a, 
+        operacion
     )
     SELECT
-        i.product_id,
-        product_name,
-        brand_id,
-        category_id,
-        model_year,
-        i.list_price,
+        i.producto_id,
+        producto_nombre,
+        marca_id,
+        categoria_id,
+        ano_modelo,
+        i.precio_catalogo,
         GETDATE(),
         'INS'
     FROM
         inserted i
     UNION ALL
     SELECT
-        d.product_id,
-        product_name,
-        brand_id,
-        category_id,
-        model_year,
-        d.list_price,
+        d.producto_id,
+        producto_nombre,
+        marca_id,
+        categoria_id,
+        ano_modelo,
+        d.precio_catalogo,
         GETDATE(),
         'DEL'
     FROM
@@ -218,14 +221,14 @@ END
 
 -- 3) Prueba del trigger
 
--- La siguiente sentencia inserta una nueva fila en la tabla production.products:
+-- La siguiente sentencia inserta una nueva fila en la tabla Produccion.productos:
 
-INSERT INTO production.products(
-    product_name, 
-    brand_id, 
-    category_id, 
-    model_year, 
-    list_price
+INSERT INTO Produccion.productos(
+    producto_nombre, 
+    marca_id, 
+    categoria_id, 
+    ano_modelo, 
+    precio_catalogo
 )
 VALUES (
     'Test product',
@@ -235,31 +238,334 @@ VALUES (
     599
 )
 
--- Debido al evento INSERT, se disparó el trigger production.trg_product_audit de la tabla production.products.
--- Examinemos el contenido de la tabla production.product_audits:
+-- Debido al evento INSERT, se disparó el trigger Produccion.trg_auditoria_producto de la tabla Produccion.productos.
+-- Examinemos el contenido de la tabla Produccion.AuditoriasProducto:
 
 SELECT * 
-FROM production.product_audits
+FROM Produccion.AuditoriasProducto
 
--- |---------|----------|------------|--------|-----------|----------|----------|------------------------|---------|
--- |change_id|product_id|product_name|brand_id|category_id|model_year|list_price|        updated_at      |operation|
--- |---------|----------|------------|--------|-----------|----------|----------|------------------------|---------|
--- |    1    |    322   |Test product|   1    |     1     |   2018   |  599.00  |2018-10-14 15:23:46.837 |   INS   |
--- |---------|----------|------------|--------|-----------|----------|----------|------------------------|---------|
+-- |---------------|-----------|---------------|--------|------------|----------|---------------|------------------------|---------|
+-- |modificacion_id|producto_id|producto_nombre|marca_id|categoria_id|ano_modelo|precio_catalogo|      actualizado_a     |operation|
+-- |---------------|-----------|---------------|--------|------------|----------|---------------|------------------------|---------|
+-- |       1       |    322    | Test product  |   1    |      1     |   2018   |     599.00    |2023-01-24 23:17:30.833 |   INS   |
+-- |---------------|-----------|---------------|--------|------------|----------|---------------|------------------------|---------|
 
--- La siguiente sentencia elimina una fila de la tabla production.products:
+-- La siguiente sentencia elimina una fila de la tabla Produccion.productos:
 
-DELETE FROM production.products
-WHERE product_id = 322
+DELETE FROM Produccion.productos
+WHERE producto_id = 322
 
--- Como era de esperar, el trigger se disparó e insertó la fila eliminada en la tabla production.product_audits:
+-- Como era de esperar, el trigger se disparó e insertó la fila eliminada en la tabla Produccion.AuditoriasProducto:
 
--- |---------|----------|------------|--------|-----------|----------|----------|------------------------|---------|
--- |change_id|product_id|product_name|brand_id|category_id|model_year|list_price|        updated_at      |operation|
--- |---------|----------|------------|--------|-----------|----------|----------|------------------------|---------|
--- |    1    |    322   |Test product|   1    |     1     |   2018   |  599.00  |2018-10-14 15:23:46.837 |   INS   |
--- |    2    |    322   |Test product|   1    |     1     |   2018   |  599.00  |2018-10-14 15:26:34.050 |   DEL   |  
--- |---------|----------|------------|--------|-----------|----------|----------|------------------------|---------|
+-- |---------------|-----------|---------------|--------|------------|----------|---------------|------------------------|---------|
+-- |modificacion_id|producto_id|producto_nombre|marca_id|categoria_id|ano_modelo|precio_catalogo|      actualizado_a     |operation|
+-- |---------------|-----------|---------------|--------|------------|----------|---------------|------------------------|---------|
+-- |       1       |    322    | Test product  |   1    |      1     |   2018   |     599.00    |2023-01-24 23:17:30.833 |   INS   |
+-- |       2       |    322    | Test product  |   1    |      1     |   2018   |     599.00    |2023-01-24 23:28:15.530 |   DEL   |
+-- |---------------|-----------|---------------|--------|------------|----------|---------------|------------------------|---------|
+
+/*
+
+   ============================================================================================
+   ============================================================================================                    
+
+   ==================
+   === INSTEAD OF ===
+   ==================
+
+   - El ejemplo que se creo basicamente es similar al anterior, solo que en este caso el trigger se
+     activará cuando se inserte un registro en una VISTA, cosa que nos permite INSTEAD OF sobre AFTER
+     que solo actua sobre TABLAS.
+
+   Un trigger INSTEAD OF es un trigger que permite omitir una sentencia INSERT, DELETE o UPDATE en una 
+   tabla o "vista" y ejecutar en su lugar otras sentencias definidas en el trigger. La operación real de 
+   inserción, eliminación o actualización no se produce en absoluto.
+
+   En otras palabras, un trigger INSTEAD OF omite una sentencia DML y ejecuta otras sentencias.
+
+
+   Sintaxis del trigger INSTEAD OF de SQL Server
+   =============================================
+
+   A continuación, se ilustra la sintaxis para crear un trigger INSTEAD OF:
+
+                                CREATE TRIGGER [schema_name.] trigger_name
+                                ON {table_name | view_name }
+                                INSTEAD OF {[INSERT] [,] [UPDATE] [,] [DELETE] }
+                                AS
+                                {sql_statements}
+
+
+   En esta sintaxis:
+
+   - En primer lugar, especifique el nombre del trigger y, opcionalmente, el nombre del schema al que pertenece 
+     el trigger en la cláusula CREATE TRIGGER.
+
+   - Segundo, especifique el nombre de la tabla o vista a la que se asocia el trigger.
+
+   - Tercero, especifique un evento como INSERT, DELETE o UPDATE que el trigger disparará en la cláusula INSTEAD OF. 
+     El trigger puede ser llamado para responder a uno o múltiples eventos.
+
+   - Cuarto, coloque el cuerpo del trigger después de la palabra clave AS. El cuerpo de un trigger puede consistir 
+     en una o más sentencias Transact-SQL.
+
+
+   Ejemplo de trigger INSTEAD OF de SQL Server
+   ===========================================
+
+   Un ejemplo típico de uso de un trigger INSTEAD OF es la anulación de una operación de inserción, actualización 
+   o eliminación en una vista.
+
+   Supongamos que una aplicación necesita insertar nuevas marcas en la tabla Produccion.marcas. Sin embargo, las 
+   nuevas marcas deben almacenarse en otra tabla llamada Produccion.marcas_aprobaciones para su aprobación antes 
+   de insertarlas en la tabla Produccion.marcas.
+
+   Para ello, cree una vista denominada Produccion.v_marcas para que la aplicación inserte las nuevas marcas. Si 
+   se insertan marcas en la vista, se disparará un trigger INSTEAD OF para insertar marcas en la tabla 
+   Produccion.marcas_aprobaciones. */
+
+   USE TiendaBicicletas
+
+/*
+
+   1) Creación tabla para almacenar marcas pendientes de aprobación
+
+   La siguiente sentencia crea una nueva tabla llamada Produccion.marcas_aprobaciones para almacenar las marcas 
+   pendientes de aprobación:  */
+
+CREATE TABLE Produccion.marcas_aprobaciones(
+    marca_id INT IDENTITY PRIMARY KEY,
+    marca_nombre VARCHAR(255) NOT NULL
+)
+
+/*
+   2) Creación de la vista que alamacenará de manera previa las marcas a aprobar
+
+   La siguiente sentencia crea una nueva vista llamada Produccion.v_marcas contra las tablas Produccion.marcas 
+   y Produccion.marcas_aprobaciones:  */
+
+CREATE VIEW Produccion.v_marcas 
+AS
+SELECT
+    marca_nombre,
+    'Aprobado' estado_aprobacion
+FROM
+    Produccion.marcas
+UNION
+SELECT
+    marca_nombre,
+    'Aprobación pendiente' estado_aprobacion
+FROM
+    Produccion.marcas_aprobaciones
+
+-- Si creamos la Vista en el orden inverno es exactamente lo mismo
+
+-- CREATE VIEW Produccion.v_marcas 
+-- AS
+-- SELECT
+--     marca_nombre,
+--     'Aprobación pendiente' estado_aprobacion
+-- FROM
+--     Produccion.marcas_aprobaciones
+-- UNION
+-- SELECT
+--     marca_nombre,
+--     'Aprobado' estado_aprobacion
+-- FROM
+--     Produccion.marcas
+
+/*
+
+   3) Creación de un trigger DML INSTEAD OF
+   ========================================
+
+   Una vez que se inserta una fila en la vista Produccion.v_marcas, tenemos que dirigirla a la tabla 
+   Produccion.marcas_aprobaciones mediante el siguiente trigger INSTEAD OF:   */
+
+CREATE TRIGGER Produccion.trg_v_marcas
+ON Produccion.v_marcas
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON
+    INSERT INTO Produccion.marcas_aprobaciones( 
+        marca_nombre
+    )
+    SELECT i.marca_nombre
+    FROM inserted i
+    WHERE i.marca_nombre NOT IN (SELECT marca_nombre FROM Produccion.marcas)
+END
+
+/*
+ 
+    4) Prueba del trigger
+    =====================
+
+    El trigger inserta la nueva marca en Produccion.marcas_aprobaciones si la marca no existe en Produccion.marcas.
+
+    Insertemos una nueva marca en la vista Produccion.v_marcas:  */
+
+INSERT INTO Produccion.v_marcas(marca_nombre)
+VALUES('Vans')
+
+
+--  Esta sentencia INSERT disparó el trigger INSTEAD OF para insertar una nueva fila en la tabla 
+--  Produccion.marcas_aprobaciones.
+
+--  Si consulta los datos de la tabla Produccion.v_marcas, verá que aparece una nueva fila:
+
+SELECT
+	marca_nombre,
+	estado_aprobacion
+FROM
+	Produccion.v_marcas
+
+/*
+|--------------|--------------------|
+| marca_nombre | estado_aprobacion  |
+|--------------|--------------------|
+|   Electra	   |      Aprobado      |
+|     Haro	   |      Aprobado      |
+|    Heller	   |      Aprobado      |
+|  Pure Cycles |      Aprobado      |
+|   Ritchey	   |      Aprobado      |
+|   Strider	   |      Aprobado      |
+| Sun Bicycles |      Aprobado      |
+|    Surly	   |      Aprobado      |
+|    Trek	   |      Aprobado      |
+|    Vans	   |Aprobación pendiente|
+|--------------|--------------------|
+
+
+    La siguiente sentencia muestra el contenido de la tabla production.brand_approvals:  */
+
+SELECT *
+FROM Produccion.marcas_aprobaciones
+
+/*
+|----------|--------------|
+| marca_id | marca_nombre |
+|----------|--------------|
+|    1	   |     Vans     |
+|----------|--------------|
+
+
+   ===================================================================================================
+
+   ===================================================================================================
+   Ejemplo 2: Se creará un TRIGGER ANIDADO utilizando un Trigger DML AFTER y un Trigger DML INSTEAD OF
+   ===================================================================================================
+   */
+
+   USE EJERCICIOS
+
+-- Creamos este trigger DML AFTER sobre la tabla "tblTransaction"
+-- ¿Que es lo que hace? Al generarse un INSERT o DELETE sobre la tabla "tblTransaction" se activaran 
+-- 2 consultas SELECT sobre las tablas 'inserted' y 'deleted' respectivamente.
+
+CREATE TRIGGER tr_tblTransaction
+ON tblTransaction
+AFTER DELETE,INSERT
+AS
+BEGIN
+	SET NOCOUNT ON
+	SELECT * FROM inserted
+	SELECT * FROM deleted
+END
+GO
+
+
+-- Ya se creó esta vista. Ahora podemos revisar que contiene:
+
+SELECT * FROM ViewByDepartment
+
+
+-- Creamos este trigger DML INSTEAD OF sobre la vista "ViewByDepartment"
+
+CREATE TRIGGER tr_ViewByDepartment
+ON dbo.ViewByDepartment
+-- INSTEAD OF (En lugar de). En este ejemplo, al momento de realizar un DELETE sobre la vista, se generará
+-- una modificación a esta acción. El DELETE se activa de igual forma y quedará registrado en la tabla 'deleted',
+-- lo que no se hará, es aplicarlo directo en la Vista.
+
+INSTEAD OF DELETE 
+AS
+BEGIN
+    SET NOCOUNT ON
+	DECLARE @EmployeeNumber AS INT
+	DECLARE @DateOfTransaction AS SMALLDATETIME
+	DECLARE @Amount AS SMALLMONEY
+    -- Esta consulta como tal no devolverá nada. Sin embargo, acá lo que se hace es lo siguiente: Sabemos que
+    -- las variables cuando se les asigna una columna, capturan el último registro de esta (revisar los apuntes
+    -- de VARIABLES). Por tanto, dado que el DELETE que se realizó sobre la Vista queda registrada de igual forma
+    -- en la tabla 'deleted', estas variables capturan el último valor ingresado para cada una de estas columnas.
+	SELECT @EmployeeNumber = EmployeeNumber, @DateOfTransaction = DateOfTransaction, @Amount = TotalAmount
+	FROM deleted;
+	
+    -- Lo que hacemos aquí es generar un DELETE sobre la tabla "tblTransaction" utilizando los valores capturados
+    -- por las variables. A su vez, al generar un DELETE sobre la tabla "tblTransaction", se activará el Trigger
+    -- DML AFTER sobre esta tabla, que tenemos un poco más arriba.
+	DELETE tblTransaction
+	FROM tblTransaction AS T
+	WHERE T.EmployeeNumber = @EmployeeNumber
+	AND T.DateOfTransaction = @DateOfTransaction
+	AND T.Amount = @Amount
+END
+
+BEGIN TRAN
+	DELETE 
+	FROM dbo.ViewByDepartment
+	WHERE TotalAmount = -2.77
+	AND EmployeeNumber = 132
+ROLLBACK TRAN
+
+/*
+   ===================================================================================================
+
+   ===================================================================================================
+   Ejemplo 3: Se creará un Trigger DML INSTEAD OF que lidie con multiples registros eliminados
+   ===================================================================================================
+   */
+
+USE EJERCICIOS
+
+-- Ya se creó esta vista. Ahora podemos revisar que contiene:
+
+SELECT * FROM ViewByDepartment
+
+
+-- Creamos este trigger DML INSTEAD OF sobre la vista "ViewByDepartment"
+
+CREATE TRIGGER tr_ViewByDepartment
+ON dbo.ViewByDepartment
+-- INSTEAD OF (En lugar de). En este ejemplo, al momento de realizar un DELETE sobre la vista, se generará
+-- una modificación a esta acción. El DELETE se activa de igual forma y quedará registrado en la tabla 'deleted',
+-- lo que no se hará, es aplicarlo directo en la Vista.
+
+INSTEAD OF DELETE 
+AS
+BEGIN
+    SET NOCOUNT ON
+    SELECT *, 'A eliminar' FROM deleted
+    DELETE tblTransaction 
+    FROM tblTransaction AS T
+    INNER JOIN deleted D
+    ON T.EmployeeNumber = D.EmployeeNumber
+    AND T.DateOfTransaction = D.DateOfTransaction
+    AND T.Amount = D.TotalAmount
+END 
+GO
+
+-- El BEGIN TRAN y ROLLBACK TRAN lo utilizo como modo prueba y no generar un DELETE real sobre la tabla.
+BEGIN TRAN
+    SELECT *, 'Antes de eliminar' FROM ViewByDepartment
+    WHERE EmployeeNumber = 132;
+    -- Este DELETE representa multiples registros
+    DELETE FROM ViewByDepartment
+    WHERE EmployeeNumber = 132;
+    SELECT *, 'Despues de eliminar' FROM ViewByDepartment
+    WHERE EmployeeNumber = 132;
+ROLLBACK TRAN
 
 /*
    ============================================================================================
