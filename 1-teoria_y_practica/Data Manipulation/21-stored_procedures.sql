@@ -2,52 +2,62 @@
 -- ================== STORED PROCEDURES =================
 -- ======================================================
 
--- Creación de un stored procedure sencillo
+USE TiendaBicicletas
 
--- La siguiente sentencia SELECT devuelve una lista de productos de la tabla products de la base 
--- de datos de ejemplo BikeStores:
+/*
+    ================================================
+    === CREACION DE UN STORED PROCEDURE SENCILLO ===
+    ================================================
+
+    La siguiente sentencia SELECT devuelve una lista de productos de la tabla products de la base 
+    de datos de ejemplo BikeStores:  */
 
 SELECT 
-	Name, 
-	ListPrice
+	producto_nombre, 
+	precio_catalogo
 FROM 
-	Production.Product
+	Produccion.productos
 ORDER BY 
-	Name
+	producto_nombre
 
--- Para crear un stored procedure que envuelva esta consulta, se utiliza la sentencia CREATE PROCEDURE 
--- de la siguiente manera:
+/*
+    Para crear un stored procedure que envuelva esta consulta, se utiliza la sentencia CREATE PROCEDURE 
+    de la siguiente manera:  */
 
 CREATE PROCEDURE uspProductList
 AS
 BEGIN
 	SELECT 
-		Name, 
-		ListPrice
+		producto_nombre, 
+		precio_catalogo
 	FROM 
-		Production.Product
+		Produccion.productos
 	ORDER BY 
-		Name
+		producto_nombre
 END
 
-/* En esta sintaxis:
+    /* En esta sintaxis:
 
-- uspProductList es el nombre del stored procedure.
+    - uspProductList es el nombre del stored procedure.
 
-- La palabra clave AS separa el encabezado y el cuerpo del stored procedure.
+    - La palabra clave AS separa el encabezado y el cuerpo del stored procedure.
 
-- Si el stored procedure tiene una sentencia, las palabras clave BEGIN y END que rodean la sentencia son 
-  opcionales. Sin embargo, es una buena práctica incluirlas para que el código sea claro.
+    - Si el stored procedure tiene una sentencia, las palabras clave BEGIN y END que rodean la sentencia son 
+    opcionales. Sin embargo, es una buena práctica incluirlas para que el código sea claro.
 
-Ten en cuenta que, además de las palabras clave CREATE PROCEDURE, puedes utilizar las palabras 
-clave CREATE PROC para que la sentencia sea más corta.
+    Ten en cuenta que, además de las palabras clave CREATE PROCEDURE, puedes utilizar las palabras 
+    clave CREATE PROC para que la sentencia sea más corta.
 
+/*
+   ============================================================================================
+   ============================================================================================
 
-Ejecución de un stored procedure
-================================
+    ========================================
+    === EJECUCION DE UN STORED PROCEDURE ===
+    ========================================
 
-Para ejecutar un stored procedure, se utiliza la sentencia EXECUTE o EXEC seguida del nombre del 
-stored procedure:   
+    Para ejecutar un stored procedure, se utiliza la sentencia EXECUTE o EXEC seguida del nombre del 
+    stored procedure:   
 
 										EXECUTE sp_name
 
@@ -55,43 +65,53 @@ o
 
 										EXEC sp_name
 
-donde "sp_name" es el nombre del stored procedure que desea ejecutar.
+    donde "sp_name" es el nombre del stored procedure que desea ejecutar.
 
-Por ejemplo, para ejecutar el stored procedure uspProductList, utilice la siguiente sentencia:   */
+    Por ejemplo, para ejecutar el stored procedure uspProductList, utilice la siguiente sentencia:   */
 
 EXEC uspProductList
 
+/*
+   ============================================================================================
+   ============================================================================================
 
-/* Modificación de un stored procedure
-   ===================================
+   ===========================================
+   === MODIFICACION DE UN STORED PROCEDURE ===
+   ===========================================
 
-Para modificar un stored procedure existente, utilice la sentencia ALTER PROCEDURE.
 
-En primer lugar, abra el stored procedure para ver su contenido haciendo clic con el botón derecho del 
-ratón en el nombre del stored procedure y seleccionando el elemento de menú Modify.
+    Para modificar un stored procedure existente, utilice la sentencia ALTER PROCEDURE.
 
-En segundo lugar, cambie el cuerpo del stored procedure ordenando los productos por list prices en lugar 
-de por product names:   */
+    En primer lugar, abra el stored procedure para ver su contenido haciendo clic con el botón derecho del 
+    ratón en el nombre del stored procedure y seleccionando el elemento de menú Modify.
+
+    En segundo lugar, cambie el cuerpo del stored procedure ordenando los productos por precio_catalogo en lugar 
+    de por product names:   */
 
  ALTER PROCEDURE uspProductList
     AS
     BEGIN
 		SELECT 
-			Name, 
-			ListPrice
+			producto_nombre, 
+			precio_catalogo
 		FROM 
-			Production.Product
+			Produccion.productos
 		ORDER BY 
-			ListPrice
+			precio_catalogo
     END
 
--- Ahora, si ejecuta de nuevo el stored procedure, verá que los cambios surten efecto:
+/*  Ahora, si ejecuta de nuevo el stored procedure, verá que los cambios surten efecto:   */
 
 EXEC uspProductList
 
+/*
+   ============================================================================================
+   ============================================================================================
 
-/* Eliminación de un stored procedure
-   ==================================
+   ==========================================
+   === ELIMINACION DE UN STORED PROCEDURE ===
+   ==========================================
+
 
    Para eliminar un stored procedure, se utiliza la sentencia DROP PROCEDURE o DROP PROC:
 
@@ -100,12 +120,28 @@ EXEC uspProductList
    o
 
    									DROP PROC sp_name
+    
+   o
+
+                          DROP PROCEDURE IF EXISTS schema_name.sp_name
 
    donde sp_name es el nombre del stored procedure que desea eliminar.
 
    Por ejemplo, para eliminar el stored procedure uspProductList, ejecute la siguiente sentencia:  */
 
+
+DROP PROCEDURE IF EXISTS uspProductList
+
+
+/*  Otra forma de eliminarlo es la siguiente similar a la anterior es la siguiente:  */
+
+IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'uspProductList')
 DROP PROCEDURE uspProductList
+
+-- Segunda forma
+SELECT OBJECT_ID('uspProductList', 'P') IS NOT NULL
+DROP PROCEDURE uspProductList
+    
 
 
 -- ============================================================================================
@@ -121,12 +157,12 @@ DROP PROCEDURE uspProductList
 -- La siguiente consulta devuelve una lista de productos de la tabla Products:
 
 SELECT 
-	Name, 
-	ListPrice
+	producto_nombre, 
+	precio_catalogo
 FROM 
-	Production.Product
+	Produccion.productos
 ORDER BY 
-	ListPrice
+	precio_catalogo
 
 -- Puede crear un stored procedure que envuelva esta consulta utilizando la sentencia CREATE PROCEDURE:
 
@@ -134,29 +170,29 @@ CREATE PROCEDURE uspFindProducts
 AS
 BEGIN
 	SELECT 
-		Name, 
-		ListPrice
+		producto_nombre, 
+		precio_catalogo
 	FROM 
-		Production.Product
+		Produccion.productos
 	ORDER BY 
-		ListPrice
+		precio_catalogo
 END
 
 -- Sin embargo, esta vez podemos añadir un parámetro al stored procedure para encontrar los productos 
--- cuyos list prices son mayores que un input price:
+-- cuyos precio_catalogo son mayores que un input price:
 
 ALTER PROCEDURE uspFindProducts(@min_list_price AS DECIMAL)
 AS
 BEGIN
 	SELECT 
-		Name, 
-		ListPrice
+		producto_nombre, 
+		precio_catalogo
 	FROM 
-		Production.Product
+		Produccion.productos
     WHERE
-        ListPrice >= @min_list_price
+        precio_catalogo >= @min_list_price
 	ORDER BY 
-		ListPrice
+		precio_catalogo
 END
 
 /* En este ejemplo:
@@ -166,8 +202,72 @@ END
   del parámetro @min_list_price. El parámetro debe estar rodeado por los corchetes de apertura y cierre.
 
 - En segundo lugar, utilizamos el parámetro @min_list_price en la cláusula WHERE de la sentencia SELECT 
-  para filtrar sólo los productos cuyos list prices son mayores o iguales que @min_list_price.
+  para filtrar sólo los productos cuyos precio_catalogo son mayores o iguales que @min_list_price.
 
+-- ============================================================================================
+
+  Sin embargo, esta vez podemos añadir un IF EXISTS, para comprobar primeramente si existen valores
+  que satisfagan esta comparación. En el caso de que si ocurra, se ejecuta la consulta SELECT y en el
+  caso contrario, no ocurrirá nada.   */
+
+ALTER PROCEDURE uspFindProducts(@min_list_price AS DECIMAL)
+AS
+BEGIN
+    IF EXISTS (SELECT * FROM Produccion.productos 
+                WHERE precio_catalogo >= @min_list_price)
+    BEGIN
+        SELECT 
+            producto_nombre, 
+            precio_catalogo
+        FROM 
+            Produccion.productos
+        WHERE
+            precio_catalogo >= @min_list_price
+        ORDER BY 
+            precio_catalogo
+    END
+END
+
+-- ============================================================================================
+
+/* Podemos expandir a nuestra necesidad la lógica del stored procedure, como por ejemplo, ir agregando
+   más IF (es solo un ejemplo de como ir agregando más IF, dado que la lógica no tiene sentido):  */
+
+ALTER PROCEDURE uspFindProducts(@min_list_price AS DECIMAL)
+AS
+BEGIN
+    IF EXISTS (SELECT * FROM Produccion.productos 
+                WHERE precio_catalogo >= @min_list_price)
+    BEGIN
+        IF @min_list_price < 50
+        BEGIN
+            SELECT 
+                producto_nombre, 
+                precio_catalogo
+            FROM 
+                Produccion.productos
+            WHERE
+                precio_catalogo >= @min_list_price
+            ORDER BY 
+                precio_catalogo
+        END
+        ELSE
+        BEGIN
+            SELECT 
+                producto_nombre, 
+                precio_catalogo
+            FROM 
+                Produccion.productos
+            WHERE
+                precio_catalogo >= @min_list_price
+            ORDER BY 
+                precio_catalogo  
+        END
+    END
+END
+
+
+/*
 
 Ejecución de un stored procedure con un parámetro
 =================================================
@@ -176,7 +276,7 @@ Para ejecutar el stored procedure uspFindProducts, se le pasa un argumento de la
 
 EXEC uspFindProducts 100
 
--- El stored procedure devuelve todos los productos cuyos list prices son mayores o iguales que 100.
+-- El stored procedure devuelve todos los productos cuyos precio_catalogo son mayores o iguales que 100.
 
 -- Si cambia el argumento a 200, obtendrá un conjunto de resultados diferente:
 
@@ -198,21 +298,57 @@ ALTER PROCEDURE uspFindProducts(
 AS
 BEGIN
 	SELECT 
-		Name, 
-		ListPrice
+		producto_nombre, 
+		precio_catalogo
 	FROM 
-		Production.Product
+		Produccion.productos
     WHERE
-        ListPrice >= @min_list_price AND
-        ListPrice <= @max_list_price
+        precio_catalogo >= @min_list_price AND
+        precio_catalogo <= @max_list_price
     ORDER BY
-        ListPrice
+        precio_catalogo
 END
 
 -- Una vez que el stored procedure se ha modificado correctamente, puede ejecutarlo pasando dos 
 -- argumentos, uno para @min_list_price y otro para @max_list_price:
 
 EXECUTE uspFindProducts 900, 1000
+
+
+-- ============================================================================================
+
+/* A modo de ejemplo podemos añadir la sentencia WHILE a la lógica del stored procedure:  */
+
+ALTER PROCEDURE uspFindProducts(
+    @min_list_price AS DECIMAL
+    ,@max_list_price AS DECIMAL
+)
+AS
+BEGIN
+    IF EXISTS (SELECT * FROM Produccion.productos 
+                WHERE precio_catalogo BETWEEN @min_list_price AND @max_list_price)
+    BEGIN
+        WHILE @min_list_price <= @max_list_price
+        BEGIN
+            SELECT 
+                producto_nombre, 
+                precio_catalogo
+            FROM 
+                Produccion.productos
+            WHERE
+                precio_catalogo = @min_list_price
+            ORDER BY
+                precio_catalogo
+            SET @min_list_price = @min_list_price + 1
+        END
+    END
+END
+
+/* Lo que hará este stored procedure es deolvernos una consulta SELECT por cada precio, comenzando
+   por el precio capturado en la variable @min_list_price. Luego el precio se irá incrementando en 1 
+   hasta igualar el precio capturado en la variable @max_list_price.
+
+
 
 
 /* Uso de parámetros con nombre
@@ -244,16 +380,16 @@ ALTER PROCEDURE uspFindProducts(
 AS
 BEGIN
 	SELECT 
-		Name, 
-		ListPrice
+		producto_nombre, 
+		precio_catalogo
 	FROM 
-		Production.Product
+		Produccion.productos
     WHERE
-        ListPrice >= @min_list_price AND
-        ListPrice <= @max_list_price AND
-        Name LIKE '%' + @name + '%'
+        precio_catalogo >= @min_list_price AND
+        precio_catalogo <= @max_list_price AND
+        producto_nombre LIKE '%' + @name + '%'
     ORDER BY
-        ListPrice
+        precio_catalogo
 END
 
 -- Una vez que el stored procedure ha sido modificado con éxito, puede ejecutarlo de la siguiente manera:
@@ -283,16 +419,16 @@ ALTER PROCEDURE uspFindProducts(
 AS
 BEGIN
 	SELECT 
-		Name, 
-		ListPrice
+		producto_nombre, 
+		precio_catalogo
 	FROM 
-		Production.Product
+		Produccion.productos
     WHERE
-        ListPrice >= @min_list_price AND
-        ListPrice <= @max_list_price AND
-        Name LIKE '%' + @name + '%'
+        precio_catalogo >= @min_list_price AND
+        precio_catalogo <= @max_list_price AND
+        producto_nombre LIKE '%' + @name + '%'
     ORDER BY
-        ListPrice
+        precio_catalogo
 END
 
 -- En este stored procedure, asignamos 0 como valor por defecto para el parámetro @min_list_price 
@@ -310,7 +446,7 @@ EXECUTE uspFindProducts
    Los parámetros @min_list_price y @max_list_price se denominan parámetros opcionales.
 
    Por supuesto, también puede pasar los argumentos a los parámetros opcionales. Por ejemplo, la siguiente 
-   sentencia devuelve todos los productos cuyos list prices sean mayores o iguales a 6.000 y los nombres 
+   sentencia devuelve todos los productos cuyos precio_catalogo sean mayores o iguales a 6.000 y los nombres 
    contengan la palabra Trek:   */
 
 EXECUTE uspFindProducts 
@@ -318,11 +454,12 @@ EXECUTE uspFindProducts
     @name = 'Trek'
 
 
+
 /* Uso de NULL como valor predeterminado
    =====================================
 
 En el stored procedure 'uspFindProducts', utilizamos 999,999 como maximum list price por defecto. Esto no 
-es robusto porque en el futuro puede tener productos con list prices superiores a ese valor.
+es robusto porque en el futuro puede tener productos con precio_catalogo superiores a ese valor.
 
 Una técnica típica para evitar esto es utilizar NULL como valor por defecto para los parámetros:  */
 
@@ -334,24 +471,25 @@ ALTER PROCEDURE uspFindProducts(
 AS
 BEGIN
 	SELECT 
-		Name, 
-		ListPrice
+		producto_nombre, 
+		precio_catalogo
 	FROM 
-		Production.Product
+		Produccion.productos
     WHERE
-        ListPrice >= @min_list_price AND
-        (@max_list_price IS NULL OR ListPrice <= @max_list_price) AND
-        Name LIKE '%' + @name + '%'
+        precio_catalogo >= @min_list_price AND
+        (@max_list_price IS NULL OR precio_catalogo <= @max_list_price) AND
+        producto_nombre LIKE '%' + @name + '%'
     ORDER BY
-        ListPrice
+        precio_catalogo
 END
 
 -- La siguiente sentencia ejecuta el stored procedure uspFindProducts para encontrar el producto cuyos 
--- list prices son mayores o iguales a 500 y los nombres contienen la palabra "Haro".
+-- precio_catalogo son mayores o iguales a 500 y los nombres contienen la palabra "Haro".
 
 EXECUTE uspFindProducts 
     @min_list_price = 500,
     @name = 'Haro'
+
 
 /*
    ============================================================================================
@@ -374,16 +512,16 @@ EXECUTE uspFindProducts
   Por ejemplo, el siguiente stored procedure encuentra productos por sellstart_year y devuelve el número 
   de productos a través del parámetro output @product_count:   */
 
-  CREATE PROCEDURE uspFindProductBySellStart (
+CREATE PROCEDURE uspFindProductBySellStart (
     @sellstart_year SMALLINT,
     @product_count INT OUTPUT
 ) AS
 BEGIN
 	SELECT 
-		Name, 
-		ListPrice
+		producto_nombre, 
+		precio_catalogo
 	FROM 
-		Production.Product
+		Produccion.productos
     WHERE
         YEAR(SellStartDate) = @sellstart_year
 

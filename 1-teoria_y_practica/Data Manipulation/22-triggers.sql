@@ -116,12 +116,13 @@ CHECK(operacion = 'INS' or operacion='DEL')
 
    CREATE TRIGGER Produccion.trg_auditoria_producto
 
--- A continuación, especifique en la cláusula ON el nombre de la tabla que activará el trigger cuando se 
--- produzca un evento: 
+/*
+A continuación, especifique en la cláusula ON el nombre de la tabla que activará el trigger cuando se 
+produzca un evento:  */
 
    ON Produccion.productos
 
--- A continuación, indique el evento o eventos que activarán el trigger en la cláusula AFTER:
+/* A continuación, indique el evento o eventos que activarán el trigger en la cláusula AFTER: */
 
    AFTER INSERT, DELETE
 
