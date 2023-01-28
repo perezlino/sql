@@ -509,11 +509,11 @@ EXECUTE uspFindProducts
   Un stored procedure puede tener muchos parámetros output. Además, los parámetros output pueden ser 
   de cualquier tipo de datos válido, por ejemplo, integer, date y varying character (VARCHAR).
 
-  Por ejemplo, el siguiente stored procedure encuentra productos por sellstart_year y devuelve el número 
+  Por ejemplo, el siguiente stored procedure encuentra productos por modelo_year y devuelve el número 
   de productos a través del parámetro output @product_count:   */
 
-CREATE PROCEDURE uspFindProductBySellStart (
-    @sellstart_year SMALLINT,
+CREATE PROCEDURE uspFindProductByModelYear (
+    @modelo_year SMALLINT,
     @product_count INT OUTPUT
 ) AS
 BEGIN
@@ -523,7 +523,7 @@ BEGIN
 	FROM 
 		Produccion.productos
     WHERE
-        YEAR(SellStartDate) = @sellstart_year
+        ano_modelo = @modelo_year
 
     SELECT @product_count = @@ROWCOUNT
 END
@@ -542,16 +542,18 @@ Por ejemplo, la siguiente sentencia ejecuta el stored procedure uspFindProductBy
 
 DECLARE @count INT
 
-EXEC uspFindProductBySellStart
-    @sellstart_year = 2008,
+EXEC uspFindProductByModelYear
+    @modelo_year = 2016,
     @product_count = @count OUTPUT
 
 SELECT @count AS 'Número de productos encontrados'
 
 
--- También puedes llamar al stored procedure uspFindProductBySellStart de la siguiente manera:
+-- También puedes llamar al stored procedure uspFindProductByModelYear de la siguiente manera:
 
-EXEC uspFindProductByModel 2018, @count OUTPUT
+DECLARE @count INT
+
+EXEC uspFindProductByModelYear 2016, @count OUTPUT
 
 -- Tenga en cuenta que si olvida la palabra clave OUTPUT después de la variable @count, la variable 
 -- @count será NULL. Por último, muestre el valor de la variable @count:
