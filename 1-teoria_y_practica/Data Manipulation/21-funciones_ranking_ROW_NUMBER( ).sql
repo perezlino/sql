@@ -191,3 +191,16 @@
 
     En segundo lugar, la consulta externa devolvió las filas de la segunda página, que tienen el número de 
     fila entre 21 y 30.
+
+
+
+    Uso de ROW_NUMBER() con SELECT NULL
+    -----------------------------------  */
+
+    -- También nosp ermite generar un correlativo para cada fila
+
+    SELECT *, ROW_NUMBER() OVER(ORDER BY (SELECT NULL)) row_num
+    FROM 
+        Ventas.clientes
+    ORDER BY 
+        ciudad

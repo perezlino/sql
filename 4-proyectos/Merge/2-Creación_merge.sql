@@ -12,7 +12,6 @@
 
 USE Transacciones   
 
-
 /*
  1) Análisis de ambas tablas
  ===========================  */

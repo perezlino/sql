@@ -271,7 +271,7 @@ FROM tblAttendance
 
 /*
 |----------------|-----------------|------------------|-----------------|
-| EmployeeNumber | AttendanceMonth | NumberAttendance | RunningTotal |
+| EmployeeNumber | AttendanceMonth | NumberAttendance | RunningTotal    |
 |----------------|-----------------|------------------|-----------------|
 |      123	     |    2014-01-01   |	    14        |       14        |
 |      123	     |    2014-02-01   |	    12        |       26        |
@@ -312,7 +312,7 @@ FROM tblAttendance
 
 /*
 |----------------|-----------------|------------------|-----------------|
-| EmployeeNumber | AttendanceMonth | NumberAttendance | RunningTotal |
+| EmployeeNumber | AttendanceMonth | NumberAttendance | RunningTotal    |
 |----------------|-----------------|------------------|-----------------|
 |      123	     |    2014-01-01   |	    14        |       26        | -->  0 + 14 + 12 = 26
 |      123	     |    2014-02-01   |	    12        |       49        | --> 14 + 12 + 23 = 49 
