@@ -33,3 +33,34 @@
     |       1       | SuperiorCard | 33332664695310	|    11	   |  2006   | 2013-07-29 00:00:00.000 |
     |       2	    | Distinguish  | 55552127249722	|     8	   |  2005	 | 2013-12-05 00:00:00.000 |    
     |---------------|--------------|----------------|----------|---------|-------------------------|
+
+/*
+    =================================================
+    === QUOTENAME [Lista de valores en corchetes] ===
+    =================================================
+
+    Nos devolverá los valores en corchetes  */
+
+    USE TiendaBicicletas
+
+    SELECT categoria_nombre FROM Produccion.categorias
+
+
+    SELECT 
+        QUOTENAME(categoria_nombre) nombres_encabezados
+    FROM 
+        Produccion.categorias
+    ORDER BY 
+        categoria_nombre
+/*
+|------------------------|
+|  nombres_encabezados   |
+|------------------------|
+|  [Children Bicycles]   |
+|  [Comfort Bicycles]    |
+|  [Cruisers Bicycles]   |
+|  [Cyclocross Bicycles] |
+|  [Electric Bikes]      |
+|  [Mountain Bikes]      |   
+|  [Road Bikes]          |   
+|------------------------|

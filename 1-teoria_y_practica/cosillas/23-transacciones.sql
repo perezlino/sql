@@ -2,6 +2,37 @@
 -- ==================== TRANSACCIONES ===================
 -- ======================================================
 
+/*	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Una transacción es una unidad única de trabajo que se ejecuta de manera independiente. Ejemplo:
    Las sentencias INSERT,UPDATE,DELETE entre otras.
 

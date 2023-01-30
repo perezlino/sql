@@ -145,3 +145,35 @@ FROM Sales.Customer c
 WHERE NOT EXISTS 
                 (SELECT CustomerID FROM Sales.SalesOrderHeader so 
                   WHERE so.CustomerID = c.CustomerID)
+
+-- Traemos la cantidad de trnasacciones por EmployeeNumber.
+-- Este campo podriamos traerlo haciendo un INNER JOIN
+
+USE EJERCICIOS
+
+SELECT * FROM tblEmployee
+
+SELECT EmployeeNumber, COUNT(1) 
+FROM tblTransaction 
+GROUP BY EmployeeNumber
+ORDER BY EmployeeNumber
+
+---------------------------------
+
+-- Subconsulta
+
+SELECT *, (SELECT COUNT(1) FROM tblTransaction T WHERE T.EmployeeNumber = E.EmployeeNumber) AS NumTransaction
+FROM  tblEmployee AS E
+ORDER BY EmployeeNumber
+
+---------------------------------
+
+-- Obtenemos el mismo resultado utilizando un INNER JOIN
+
+SELECT E.*, COUNT(T.EmployeeNumber)
+FROM tblEmployee E
+INNER JOIN tblTransaction T
+ON E.EmployeeNumber = T.EmployeeNumber
+GROUP BY E.EmployeeNumber, E.EmployeeFirstName, E.EmployeeLastName,
+         E.EmployeeMiddleName, E.EmployeeGovernmentID, E.DateOfBirth,
+         E.Department
