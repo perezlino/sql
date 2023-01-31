@@ -2,6 +2,8 @@
 -- ========= DESGLOSE ADVENTURE WORKS 2019 =========
 -- =================================================
 
+-- Explicacion: https://dataedo.com/samples/html/AdventureWorks/doc/AdventureWorks_2/tables.html
+
 -------------------------------------------
 -- IMPORTANTE RECORDAR !!!!!!!!!!!!!!!!!!!:
 -------------------------------------------
@@ -23,9 +25,9 @@
 
 -- BusinessEntityID es el ID del empleado
 
-SELECT * FROM [HumanResources].[Employee]                  -- BusinessEntityID
-SELECT * FROM [HumanResources].[Department]                -- DepartmentID
-SELECT * FROM [HumanResources].[EmployeeDepartmentHistory] -- BusinessEntityID, DepartmentID, ShiftID
+SELECT * FROM [HumanResources].[Employee]                  -- BusinessEntityID ----> Employee.BusinessEntityID = Person.BusinessEntityID
+SELECT * FROM [HumanResources].[Department]                -- DepartmentID 
+SELECT * FROM [HumanResources].[EmployeeDepartmentHistory] -- BusinessEntityID, DepartmentID, ShiftID ----> EmployeeDepartmentHistory.BusinessEntityID = Employee.BusinessEntityID
 SELECT * FROM [HumanResources].[JobCandidate]
 SELECT * FROM [HumanResources].[EmployeePayHistory]
 SELECT * FROM [HumanResources].[JobCandidate]
@@ -88,11 +90,11 @@ SELECT * FROM [Sales].[CountryRegionCurrency]        -- CountryRegionCode, Curre
 SELECT * FROM [Sales].[CreditCard]                   -- CreditCardID
 SELECT * FROM [Sales].[Currency]                     -- CurrencyCode
 SELECT * FROM [Sales].[CurrencyRate]                 -- CurrencyRateID
-SELECT * FROM [Sales].[Customer]                     -- CustomerID, PersonID, StoreID, TerritoryID
+SELECT * FROM [Sales].[Customer]                     -- CustomerID, PersonID, StoreID, TerritoryID  ----> Customer.PersonID = Person.Person.BusinessEntityID
 SELECT * FROM [Sales].[PersonCreditCard]             -- BusinessEntityID, CreditCardID
 SELECT * FROM [Sales].[SalesOrderDetail]             -- SalesOrderID, SalesOrderDetailID, ProductID, SpecialOfferID
-SELECT * FROM [Sales].[SalesOrderHeader]             -- SalesOrderID, CustomerID, SalesPersonID (el simil a BusinessEntityID), TerritoryID, BillToAddressID, 
-                                                     -- ShipToAddressID, ShipMethodID, CreditCardID, CurrencyRateID
+SELECT * FROM [Sales].[SalesOrderHeader]             -- SalesOrderID, CustomerID, SalesPersonID, TerritoryID, BillToAddressID, 
+                                                     -- ShipToAddressID, ShipMethodID, CreditCardID, CurrencyRateID ----> Sales.SalesOrderHeader.SalesPersonID = Sales.SalesPerson.BusinessEntityID
 SELECT * FROM [Sales].[SalesOrderHeaderSalesReason]  -- SalesOrderID, SalesReasonID
 SELECT * FROM [Sales].[SalesPerson]                  -- BusinessEntityID, TerritoryID
 SELECT * FROM [Sales].[SalesPersonQuotaHistory]      -- BusinessEntityID

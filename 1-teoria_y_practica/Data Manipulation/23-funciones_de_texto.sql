@@ -139,7 +139,21 @@ SELECT TRANSLATE('AB','ABC','XXX') -- XX
    y la cantidad de veces que queremos duplicar
 */
 
-SELECT REPLICATE('NO',5)
+SELECT REPLICATE('NO',5) AS Replicate
+/*
+|-----------|
+| Replicate |
+|-----------|
+|NONONONONO |
+|-----------| */
+
+SELECT REPLICATE('*',10) AS Replicate
+/*
+|-----------|
+| Replicate |
+|-----------|
+|********** |
+|-----------| */
 
 -- ============================================================================================
 -- ============================================================================================
