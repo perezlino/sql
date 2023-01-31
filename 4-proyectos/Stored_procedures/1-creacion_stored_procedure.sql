@@ -11,10 +11,10 @@
     USE AdventureWorks2019;   
 
 
-    CREATE PROCEDURE uspGetCreditInfoForCustomer (
+    CREATE PROCEDURE uspObtenerInfoCreditoCliente (
         @nombre VARCHAR(40),
         @apellido VARCHAR(40),
-        @creditInfo VARCHAR(200) OUTPUT
+        @creditoInfo VARCHAR(200) OUTPUT
     )
     AS
     BEGIN
@@ -34,7 +34,7 @@
 
         IF @@ROWCOUNT > 0
         BEGIN
-            SELECT @creditInfo = 'Card: ' + CC.CardType + ' - ' + 
+            SELECT @creditoInfo = 'Card: ' + CC.CardType + ' - ' + 
                                 REPLICATE('*', LEN(CC.CardNumber)-4) + RIGHT(CC.CardNumber,4) +
                                 ' Exp: ' + CAST(CC.ExpYear AS VARCHAR(4)) + '-' +
                                 CAST(CC.ExpMonth AS VARCHAR(2))
@@ -45,7 +45,7 @@
         END
         ELSE
         BEGIN
-            SET @creditInfo = 'Cliente no tiene información sobre sus tarjetas de crédito'
+            SET @creditoInfo = 'Cliente no tiene información sobre sus tarjetas de crédito'
         END
 
     END
@@ -54,16 +54,16 @@
 
     DECLARE @tarjetaCreditoInfo VARCHAR(200)
 
-    EXEC uspGetCreditInfoForCustomer
+    EXEC uspObtenerInfoCreditoCliente
     @nombre = 'Kristina',
     @apellido = 'Garcia' ,
-    @creditInfo = @tarjetaCreditoInfo OUTPUT
+    @creditoInfo = @tarjetaCreditoInfo OUTPUT
 
     SELECT @tarjetaCreditoInfo AS 'Resultado Test 1'
 
-    EXEC uspGetCreditInfoForCustomer
+    EXEC uspObtenerInfoCreditoCliente
     @nombre = 'Alfonso',
     @apellido = 'Perez' ,
-    @creditInfo = @tarjetaCreditoInfo OUTPUT
+    @creditoInfo = @tarjetaCreditoInfo OUTPUT
 
     SELECT @tarjetaCreditoInfo AS 'Resultado Test 2'
