@@ -460,3 +460,149 @@ ORDER BY
 -- |Electra Cruiser 2020            |        2020        |
 -- |            ............        |     ...........    |
 -- |--------------------------------|--------------------|
+
+
+-- ============================================================================================
+-- ============================================================================================
+
+-- ====================
+-- === STRING_SPLIT ===
+-- ====================
+
+/* La función STRING_SPLIT() es una función con valor de tabla que divide una cadena en una tabla formada por filas 
+   de subcadenas basadas en un separador especificado.
+
+   A continuación se muestra la sintaxis de la función STRING_SPLIT():
+
+                                 
+                                 STRING_SPLIT ( input_string , separator )  
+
+
+   En esta sintaxis
+
+   - "input_string": es una expresión basada en caracteres que se evalúa a un string de NVARCHAR, VARCHAR, NCHAR o CHAR.
+
+   - "separator": es un único carácter utilizado como separador para la división.
+
+   La función STRING_SPLIT() devuelve una tabla de una sola columna, cuyo nombre de columna es "value". Esta tabla de 
+   resultados contiene filas que son las subcadenas.
+
+   Tenga en cuenta que los valores de la columna "value" pueden estar en cualquier orden. Para obtener el orden esperado, 
+   debe añadir la cláusula ORDER BY a la sentencia SELECT:   
+
+
+                                          ORDER BY value [ASC|DESC]
+
+
+   Ejemplos de la función STRING_SPLIT() de SQL Server
+   ====================================================
+
+   Veamos algunos ejemplos de uso de la función STRING_SPLIT().
+
+   A) Uso de la función STRING_SPLIT() para dividir una cadena de valores separados por comas
+   ------------------------------------------------------------------------------------------
+      Este ejemplo utiliza la función STRING_SPLIT() para analizar una lista de valores separados por comas:  */                                         
+
+      SELECT 
+         value  
+      FROM 
+         STRING_SPLIT('red,green,,blue', ',');
+
+      
+/*    Este es el resultado: 
+
+      value
+      ---------------
+      red
+      green
+
+      blue
+
+      (4 rows affected)
+
+
+      La tercera fila está vacía porque la cadena de entrada contiene dos comas consecutivas (,,). Para obtener subcadenas 
+      no vacías, añada una cláusula WHERE a la sentencia SELECT, como se muestra en la siguiente consulta:     */
+
+      SELECT 
+         value  
+      FROM 
+         STRING_SPLIT('red,green,,blue', ',')
+      WHERE
+         TRIM(value) <> '';
+
+
+/*    Este es el resultado: 
+
+      value
+      ---------------
+      red
+      green
+      blue
+
+      (3 rows affected)      
+
+
+   B) Uso de la función STRING_SPLIT() para dividir una cadena separada por comas en una columna
+   ----------------------------------------------------------------------------------------------
+      A veces, las tablas de las bases de datos no están normalizadas. Un ejemplo típico de esto es cuando una columna 
+      puede almacenar múltiples valores separados por una coma (,).
+
+      STRING_SPLIT() puede ayudar a normalizar los datos dividiendo estas columnas multivaluadas.
+
+      Vamos a crear una tabla de ejemplo para la demostración.
+
+      En primer lugar, cree una nueva tabla denominada "sales.contacts" que almacene información de contacto:  */
+
+      CREATE TABLE sales.contacts (
+         id INT PRIMARY KEY IDENTITY,
+         first_name VARCHAR(100) NOT NULL,
+         last_name VARCHAR(100) NOT NULL,
+         phones VARCHAR(500)
+      );
+
+/*    En segundo lugar, inserte algunos contactos en la tabla sales.contacts:   */
+
+      INSERT INTO 
+         sales.contacts(first_name, last_name, phones)
+      VALUES
+         ('John','Doe','(408)-123-3456,(408)-123-3457'),
+         ('Jane','Doe','(408)-987-4321,(408)-987-4322,(408)-987-4323');
+
+/*    En tercer lugar, utilice la función STRING_SPLIT() para dividir los números de teléfono y CROSS APPLY para unirlos 
+      con la tabla sales.contacts:   */
+
+      SELECT 
+         first_name, 
+         last_name,
+         value phone
+      FROM 
+         sales.contacts
+         CROSS APPLY STRING_SPLIT(phones, ',');
+
+/*    first_name	last_name	phone
+      John	      Doe	      (408)-123-3456
+      John	      Doe	      (408)-123-3457
+      Jane	      Doe	      (408)-987-4321
+      Jane	      Doe	      (408)-987-4322
+      Jane	      Doe	      (408)-987-4323 
+
+
+   C) Utilización de la función STRING_SPLIT() con una función de agregación
+   -------------------------------------------------------------------------
+      El siguiente ejemplo devuelve los contactos y el número de teléfonos de cada contacto:       */        
+
+      SELECT 
+         CONCAT_WS(' ',first_name,last_name) full_name,
+         COUNT(value) number_of_phones
+      FROM 
+         sales.contacts
+         CROSS APPLY STRING_SPLIT(phones, ',')
+      GROUP BY 
+         CONCAT_WS(' ',first_name,last_name);
+
+/*    El resultado es el siguiente: 
+
+      full_name	number_of_phones
+      Jane Doe	   3
+      John Doe	   2
